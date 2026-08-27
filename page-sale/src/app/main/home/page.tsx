@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
+import HomeLayout from "./layout";
 
 // ----------------------------------------------------------------------
 
 export default function Home() {
-  redirect("/main/home");
+  return <HomeLayout />;
 }
