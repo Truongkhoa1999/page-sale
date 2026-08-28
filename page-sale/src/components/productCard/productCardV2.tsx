@@ -2,28 +2,26 @@
 
 import { Icon } from "@iconify/react";
 import {
+  Box,
   Card,
   CardContent,
-  Typography,
-  Stack,
-  Box,
-  useTheme,
-  // Button,
   Chip,
   ChipProps,
+  Stack,
+  Typography,
+  useTheme,
 } from "@mui/material";
-import { useMediaQuery } from "@mui/system";
 
 // ----------------------------------------------------------------------
-const NUMBERCHIPS = 3;
 
 type ProductCardProps = {
   image: string;
   title?: string;
-  description: string;
   price: string;
+  location?: string;
   category?: string;
-  chips: {
+
+  chips?: {
     title: string;
     color?: ChipProps["color"];
     icon?: string;
@@ -35,201 +33,250 @@ type ProductCardProps = {
 export function ProductCardV2({
   image,
   title,
-  description,
   price,
-  chips,
+  location,
+  chips = [],
 }: ProductCardProps) {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const CTA_HEIGHT = isMobile ? 36 : 40;
+
+  const badge = chips[0];
 
   return (
     <Card
-      elevation={3}
+      elevation={0}
       sx={{
-        borderRadius: { xs: 3, md: "41px" },
-        color: theme.palette.primary.main,
+        width: "100%",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
-        overflow: "visible",
-        width: "100%",
-        minHeight: theme.spacing(40),
-        height: { xs: theme.spacing(46), md: theme.spacing(58) },
-        margin: 0,
 
-        /* 🔥 LIQUID GLASS */
-        backgroundImage: `
-  linear-gradient(
-    180deg,
-    rgba(255,255,255,0.45),
-    rgba(255,255,255,0.18)
-  ),
-  url('/noise.png')
-`,
-        background: `
-      linear-gradient(
-        180deg,
-        rgba(255,255,255,0.45),
-        rgba(255,255,255,0.18)
-      )
-    `,
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        border: "1px solid rgba(255,255,255,0.35)",
-        boxShadow: `
-      0 8px 32px rgba(0,0,0,0.18),
-      inset 0 1px 0 rgba(255,255,255,0.35)
-    `,
+        borderRadius: {
+          xs: 2,
+          sm: 2.5,
+        },
+
+        overflow: "hidden",
+
+        backgroundColor: theme.palette.background.paper,
+
+        border: `1px solid ${theme.palette.divider}`,
+
+        transition: "transform 180ms ease, box-shadow 180ms ease",
+
+        "&:hover": {
+          transform: {
+            xs: "none",
+            sm: "translateY(-2px)",
+          },
+
+          boxShadow: {
+            xs: "none",
+            sm: theme.shadows[4],
+          },
+        },
       }}
     >
+      {/* ---------------------------------------------------------------- */}
+      {/* Product image */}
+      {/* ---------------------------------------------------------------- */}
+
       <Box
         sx={{
-          borderRadius: "inherit",
+          position: "relative",
           width: "100%",
-          height: "100%",
+
+          // Square on mobile, landscape on desktop.
+          aspectRatio: {
+            xs: "1 / 1",
+            sm: "4 / 3",
+          },
+
+          overflow: "hidden",
+
+          backgroundColor: theme.palette.grey[100],
         }}
       >
-        {/* Image */}
         <Box
+          component="img"
+          src={image}
+          alt={title || "Product"}
+          loading="lazy"
           sx={{
-            position: "relative",
-            top: {
-              xs: theme.spacing(-9),
-              sm: theme.spacing(-10),
-              md: theme.spacing(-14),
-            },
-            mb: {
-              xs: theme.spacing(-10),
-              sm: theme.spacing(-12),
-              md: theme.spacing(-14),
-            },
-            zIndex: 2,
-          }}
-        >
-          <Box
-            component="img"
-            src={image}
-            alt={title}
-            sx={{
-              // width: { xs: theme.spacing(15), md: theme.spacing(20) },
-              width: {
-                xs: theme.spacing(18),
-                sm: theme.spacing(22),
-                md: theme.spacing(26),
+            width: "100%",
+            height: "100%",
+            display: "block",
+
+            objectFit: "cover",
+
+            transition: "transform 300ms ease",
+
+            ".MuiCard-root:hover &": {
+              transform: {
+                xs: "none",
+                sm: "scale(1.025)",
               },
-              height: "auto",
-              objectFit: "contain",
-              mx: "auto",
-              display: "block",
+            },
+          }}
+        />
+
+        {/* Product badge */}
+        {badge ? (
+          <Chip
+            label={badge.title}
+            size="small"
+            color={badge.color}
+            icon={
+              badge.icon ? (
+                <Icon icon={badge.icon} width={14} height={14} />
+              ) : undefined
+            }
+            sx={{
+              position: "absolute",
+
+              top: {
+                xs: 8,
+                sm: 10,
+              },
+
+              left: {
+                xs: 8,
+                sm: 10,
+              },
+
+              height: {
+                xs: 24,
+                sm: 26,
+              },
+
+              fontSize: {
+                xs: "0.7rem",
+                sm: "0.75rem",
+              },
+
+              fontWeight: 600,
+
+              backgroundColor:
+                badge.color === "success"
+                  ? theme.palette.success.light
+                  : undefined,
+
+              border: "1px solid",
+              borderColor:
+                badge.color === "success"
+                  ? theme.palette.success.main
+                  : theme.palette.divider,
+
+              "& .MuiChip-icon": {
+                marginLeft: 0.75,
+              },
             }}
           />
-        </Box>
+        ) : null}
+      </Box>
 
-        {/* Content */}
-        <CardContent
-          sx={{ paddingBottom: 6, paddingTop: 2, px: { xs: 2, md: 6 } }}
+      {/* ---------------------------------------------------------------- */}
+      {/* Product information */}
+      {/* ---------------------------------------------------------------- */}
+
+      <CardContent
+        sx={{
+          flex: 1,
+
+          display: "flex",
+          flexDirection: "column",
+
+          p: {
+            xs: 1.5,
+            sm: 2,
+          },
+
+          "&:last-child": {
+            pb: {
+              xs: 1.5,
+              sm: 2,
+            },
+          },
+        }}
+      >
+        {/* Title */}
+
+        <Typography
+          variant="body1"
+          fontWeight={600}
+          color="text.primary"
+          sx={{
+            lineHeight: 1.4,
+
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+
+            wordBreak: "break-word",
+          }}
         >
-          <Typography
-            variant="h6"
-            fontWeight={700}
-            sx={{
-              mb: 1,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {title}
-          </Typography>
+          {title || "Untitled product"}
+        </Typography>
 
-          <Stack
-            sx={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              // maxHeight: theme.spacing(15),
-              maxHeight: 52,
-              overflow: "hidden",
-              gap: 0.5,
-              marginBottom: 2,
-            }}
-          >
-            {chips.slice(0, NUMBERCHIPS).map((chip, index) => (
-              <Chip
-                key={index}
-                label={chip.title}
-                size="small"
-                color={chip.color}
-                {...(chip.icon ? { icon: <Icon icon={chip.icon} /> } : {})}
-              />
-            ))}
-            {chips.length > NUMBERCHIPS && (
-              <Chip
-                label={`+${chips.length - 4} more`}
-                size="small"
-                variant="outlined"
-              />
-            )}
-          </Stack>
+        {/* Price */}
 
-          <Typography
-            variant="body2"
-            color="primary"
-            sx={{
-              mb: 2,
-              lineHeight: 1.4,
-              display: "-webkit-box",
-              WebkitLineClamp: 3,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-            }}
-          >
-            {description}
-          </Typography>
+        <Typography
+          variant="h6"
+          fontWeight={700}
+          color="success.main"
+          sx={{
+            mt: {
+              xs: 0.75,
+              sm: 1,
+            },
 
+            fontSize: {
+              xs: "1rem",
+              sm: "1.1rem",
+            },
+
+            lineHeight: 1.3,
+          }}
+        >
+          {price}
+        </Typography>
+
+        {/* Location */}
+
+        {location ? (
           <Stack
             direction="row"
-            justifyContent="space-between"
-            alignItems="stretch"
-            gap={1}
+            alignItems="center"
+            spacing={0.5}
+            sx={{
+              mt: {
+                xs: 1,
+                sm: 1.25,
+              },
+
+              minWidth: 0,
+            }}
           >
-            <Stack
+            <Icon
+              icon="solar:map-point-outline"
+              width={15}
+              height={15}
+              color={theme.palette.text.secondary}
+            />
+
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              noWrap
               sx={{
-                height: CTA_HEIGHT,
-                justifyContent: "center",
-                lineHeight: 1,
+                minWidth: 0,
               }}
             >
-              <Typography variant="caption" sx={{ lineHeight: 1 }}>
-                EUR
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                fontWeight={700}
-                sx={{ lineHeight: 1.1 }}
-              >
-                {price}
-              </Typography>
-            </Stack>
-            {/* TODO: tempo disable */}
-            {/* <Button
-              variant="outlined"
-              size={isMobile ? 'small' : 'medium'}
-              sx={{
-                height: CTA_HEIGHT,
-                minHeight: CTA_HEIGHT,
-                px: 2,
-                minWidth: 110,
-                textTransform: 'none',
-                backgroundColor: theme.palette.primary.main,
-                color: theme.palette.secondary.main,
-                borderRadius: 24,
-              }}
-            >
-              {t('actions.learn-more')}
-            </Button> */}
+              {location}
+            </Typography>
           </Stack>
-        </CardContent>
-      </Box>
+        ) : null}
+      </CardContent>
     </Card>
   );
 }
